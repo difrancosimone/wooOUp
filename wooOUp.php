@@ -27,6 +27,8 @@ function wooOUp_page(){
 			<tr valign="top">
 			<th scope="row">Api Server Address</th>
 			<td><input type="text" name="ip_api" /></td>
+      <th scope="row">Api Server Port</th>
+			<td><input type="text" name="port_api" /></td>
 			</tr>
 		</table>
 		<input type="submit" Value="Salva">
@@ -35,10 +37,11 @@ function wooOUp_page(){
 
 
 <?php
-	//recupero l'id ed eseguo le query di rimozione
+	//save worpdress plugin options
 	if ($_POST['ip_api']) {
 		if (is_int($_POST['ip_api'])) {
-			global $wpdb;
+			global $wpdb; //import global wordpress database connection
+
 			$prepared1 = $wpdb->prepare( "DELETE FROM $wpdb->users WHERE `ID` = %d", $_POST['ip_api'] );
 			echo $prepared1."<br>";
 			$prepared2 = $wpdb->prepare( "DELETE FROM $wpdb->usermeta WHERE `user_id` = %d", $_POST['ip_api'] );
@@ -47,11 +50,11 @@ function wooOUp_page(){
 			$result2 = $wpdb->query($prepared2);
 			// controllo lo stato delle query
 			if ($result1 > 0 AND $result2 > 0) {
-				echo '<h3 align="center">Impostazioni Salvate<h3>';
+				echo '<h3 align="center">Settings saved!<h3>';
 			} else {
 				echo "C'é stato un errore!";
 			}
-		} else { echo "<h3>Errore! - Il server Api non risponde</h3>";}
+		} else { echo "<h3>Error! - Server Unavailable</h3>";}
 	}
 
 }
