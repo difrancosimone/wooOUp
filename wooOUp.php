@@ -35,7 +35,6 @@ function wooOUp_page(){
 		</form>
 	</div>
 
-
 <?php
 	//save worpdress plugin options
 	if ($_POST['ip_api']) {
@@ -58,4 +57,18 @@ function wooOUp_page(){
 	}
 
 }
+
+// product page function - activate if is on woocommerce product single page
+add_action( 'woocommerce_before_single_product_summary', 'wooOUp_product_qty', 20 );
+
+function wooOUp_product_qty {
+  if is_product() {
+    ?>
+      <script>
+        console.log("OK");
+      </script>
+    <?php
+  }
+}
+
 ?>
