@@ -84,13 +84,14 @@ class wooOUp {
               </script>
             <?php
           }
+        } else {
+          ?>
+            <script>
+              console.log("PLUGIN OK SKU-> <?php echo $product->get_sku(); ?>");
+              //console.log("PLUGIN OK SKU-> <?php echo $variationsarray[1]; ?>");
+            </script>
+          <?php
         }
-        ?>
-          <script>
-            console.log("PLUGIN OK SKU-> <?php echo $product->get_sku(); ?>");
-            //console.log("PLUGIN OK SKU-> <?php echo $variationsarray[1]; ?>");
-          </script>
-        <?php
       }
     }
 
