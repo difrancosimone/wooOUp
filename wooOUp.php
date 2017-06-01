@@ -9,66 +9,71 @@
    License: GPL2
    */
 
-//add settings page in wordpress admin menù
-add_action( 'admin_menu', 'register_wooOUp' );
 
-function register_wooOUp(){
-	add_menu_page( 'wooOUp', 'wooOUp', 'manage_options', 'wooOUp', 'wooOUp_page');
-}
+class wooOUp {
+    static function install(){
+      // array of options
+      $wooOup_options = ['ip' => '127.0.0.1', 'port' => '80'];
+      // add a new option
+      add_option('wooOUp_option', $wooOup_options);
+    }
 
-function wooOUp_page(){
-//creo la struttura della pagina opzioni ?>
-	<div class="wrap">
-		<h2>Options</h2>
-		<form method="post">
-		<?php settings_fields( 'wooOUp_settings' ); ?>
-		<?php do_settings_sections( 'wooOUp-settings' ); ?>
-		<table class="form-table">
-			<tr valign="top">
-			<th scope="row">Api Server Address</th>
-			<td><input type="text" name="ip_api" /></td>
-      <th scope="row">Api Server Port</th>
-			<td><input type="text" name="port_api" /></td>
-			</tr>
-		</table>
-		<input type="submit" Value="Salva">
-		</form>
-	</div>
+    static function uninstall(){
+      delete_option( 'wooOUp_option' );
+    }
 
-<?php
-	//save worpdress plugin options
-	if ($_POST['ip_api']) {
-		if (is_int($_POST['ip_api'])) {
-			global $wpdb; //import global wordpress database connection
+    static function register_wooOUp(){
+    	add_menu_page( 'wooOUp', 'wooOUp', 'manage_options', 'wooup', array('wooOUp','wooOUp_menu'));
+    }
 
-			$prepared1 = $wpdb->prepare( "DELETE FROM $wpdb->users WHERE `ID` = %d", $_POST['ip_api'] );
-			echo $prepared1."<br>";
-			$prepared2 = $wpdb->prepare( "DELETE FROM $wpdb->usermeta WHERE `user_id` = %d", $_POST['ip_api'] );
-			echo $prepared2."<br>";
-			$result1 = $wpdb->query($prepared1);
-			$result2 = $wpdb->query($prepared2);
-			// controllo lo stato delle query
-			if ($result1 > 0 AND $result2 > 0) {
-				echo '<h3 align="center">Settings saved!<h3>';
-			} else {
-				echo "C'é stato un errore!";
-			}
-		} else { echo "<h3>Error! - Server Unavailable</h3>";}
-	}
+    static function wooOUp_menu(){
+      $options_wooOUp = get_option('wooOUp_option');
+      //creo la struttura della pagina opzioni ?>
+    	<div class="wrap">
+    		<h2>Options</h2>
+    		<form method="post">
+    		<?php settings_fields( 'wooOUp_settings' ); ?>
+    		<?php do_settings_sections( 'wooOUp-settings' ); ?>
+    		<table class="form-table">
+    			<tr valign="top">
+    			<th scope="row">Api Server Address</th>
+    			<td><input type="text" name="ip_api" value="<?php echo esc_html($options_wooOUp['ip']); ?>" /></td>
+          <th scope="row">Api Server Port</th>
+    			<td><input type="text" name="port_api" value="<?php echo esc_html($options_wooOUp['port']); ?>" /></td>
+    			</tr>
+    		</table>
+    		<input type="submit" Value="Save">
+    		</form>
+    	</div>
 
-}
-
-// product page function - activate if is on woocommerce product single page
-add_action( 'woocommerce_before_single_product_summary', 'wooOUp_product_qty', 20 );
-
-function wooOUp_product_qty {
-  if is_product() {
-    ?>
-      <script>
-        console.log("OK");
-      </script>
     <?php
-  }
+    	//save worpdress plugin options
+  		if ($_POST['ip_api'] && $_POST['port_api']) {
+        $options_wooOUp = get_option('wooOUp_option');
+        $newoption = ['ip' => $_POST['ip_api'], 'port' => $_POST['port_api']];
+        update_option( 'wooOUp_option', $options_wooOUp, $newoption );
+      }
+    }
+
+    static function wooOUp_product_qty() {
+      if (is_product()) {
+        ?>
+          <script>
+            console.log("PLUGIN OK");
+          </script>
+        <?php
+      }
+    }
+
 }
+
+//actiovation function
+register_activation_hook( __FILE__, array( 'wooOUp', 'install' ));
+//add settings page in wordpress admin menù
+add_action( 'admin_menu', array( 'wooOUp','register_wooOUp'));
+// product page function - activate if is on woocommerce product single page
+add_action( 'woocommerce_before_single_product_summary', array( 'wooOUp','wooOUp_product_qty'), 20 );
+register_deactivation_hook( __FILE__, array( 'wooOUp', 'uninstall' ) );
+
 
 ?>
