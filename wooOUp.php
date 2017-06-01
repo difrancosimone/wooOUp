@@ -2,7 +2,8 @@
    /*
    Plugin Name: wooOUp
    Plugin URI: http://#
-   Description: Integration between woocommerce and Edisoftware OndaUp software using Laravel Apis to get realtime product quantities
+   Description: Integration between Woocommerce and Edisoftware Onda https://www.edisoftware.it
+   to get realtime product quantities Laravel Apis as middleware backend
    Version: 1.0
    Author: Simone Di Franco
    Author URI:
@@ -11,17 +12,24 @@
 
 
 class wooOUp {
+    /*
+    * Function to init plugin options
+    * Server Address and Port of Backend Api
+    */
     static function install(){
-      // array of options
       $wooOup_options = ['ip' => '127.0.0.1', 'port' => '80'];
-      // add a new option
       add_option('wooOUp_option', $wooOup_options);
     }
-
+    /*
+    * Function to unistall plugin options
+    */
     static function uninstall(){
       delete_option( 'wooOUp_option' );
     }
-
+    /*
+    * Functions to add menu page in Wordpress admin
+    * Edit the plugin options
+    */
     static function register_wooOUp(){
     	add_menu_page( 'wooOUp', 'wooOUp', 'manage_options', 'wooup', array('wooOUp','wooOUp_menu'));
     }
@@ -45,7 +53,6 @@ class wooOUp {
     		<input type="submit" Value="Save">
     		</form>
     	</div>
-
     <?php
     	//save worpdress plugin options
   		if ($_POST['ip_api'] && $_POST['port_api']) {
@@ -54,7 +61,10 @@ class wooOUp {
         update_option( 'wooOUp_option', $options_wooOUp, $newoption );
       }
     }
-
+    /*
+    * Function to check availability via Api
+    * The goal is show only available product quering directly the Api
+    */
     static function wooOUp_product_availability() {
       if (is_product()) {
         global $product;
@@ -80,12 +90,17 @@ class wooOUp {
     }
 
 }
-
-//actiovation function
+/*
+* Setup Hooks
+*/
 register_activation_hook( __FILE__, array( 'wooOUp', 'install' ));
-//add settings page in wordpress admin menù
+/*
+* Hook to add menù page in admin
+*/
 add_action( 'admin_menu', array( 'wooOUp','register_wooOUp'));
-// product page function - activate if is on woocommerce product single page
+/*
+* Product page function - activate if is on woocommerce product single page
+*/
 add_action( 'woocommerce_before_single_product_summary', array( 'wooOUp','wooOUp_product_availability'), 20 );
 register_deactivation_hook( __FILE__, array( 'wooOUp', 'uninstall' ) );
 
