@@ -1,2 +1,3 @@
 # wooOUp
-Integration between woocommerce and Edisoftware OndaUp software using Laravel Apis to get realtime product quantities from Woocommerce SKU
+Integration between Woocommerce and Edisoftware Onda to get realtime product quantities using Laravel Apis as middleware backend.
+(https://www.edisoftware.it - Require a Sql Stored Procedure to work with middleware - ask me for info)

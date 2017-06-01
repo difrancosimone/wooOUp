@@ -2,8 +2,7 @@
    /*
    Plugin Name: wooOUp
    Plugin URI: http://#
-   Description: Integration between Woocommerce and Edisoftware Onda https://www.edisoftware.it
-   to get realtime product quantities Laravel Apis as middleware backend
+   Description: Integration between Woocommerce and Edisoftware to get realtime product quantities from Onda - https://www.edisoftware.it - Require a Sql Stored Procedure to work with middleware (ask me for info) using Laravel Apis as middleware backend
    Version: 1.0
    Author: Simone Di Franco
    Author URI:
