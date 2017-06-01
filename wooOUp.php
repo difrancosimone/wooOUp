@@ -55,11 +55,22 @@ class wooOUp {
       }
     }
 
-    static function wooOUp_product_qty() {
+    static function wooOUp_product_availability() {
       if (is_product()) {
+        global $product;
+	      if (is_product() and $product->product_type == 'variable') {
+          $handle=new WC_Product_Variable($product);
+          $variations1=$handle->get_children();
+          foreach ($variations1 as $value) {
+            $single_variation=new WC_Product_Variation($value);
+            echo $single_variation->get_sku();
+            echo '<option  value="'.$value.'">'.implode(" / ", $single_variation->get_variation_attributes()).'-'.get_woocommerce_currency_symbol().$single_variation->price.'</option>';
+          }
+        }
         ?>
           <script>
-            console.log("PLUGIN OK");
+            console.log("PLUGIN OK SKU-> <?php echo $product->get_sku(); ?>");
+            console.log("PLUGIN OK SKU-> <?php //echo $available_variations; ?>");
           </script>
         <?php
       }
@@ -72,7 +83,7 @@ register_activation_hook( __FILE__, array( 'wooOUp', 'install' ));
 //add settings page in wordpress admin menù
 add_action( 'admin_menu', array( 'wooOUp','register_wooOUp'));
 // product page function - activate if is on woocommerce product single page
-add_action( 'woocommerce_before_single_product_summary', array( 'wooOUp','wooOUp_product_qty'), 20 );
+add_action( 'woocommerce_before_single_product_summary', array( 'wooOUp','wooOUp_product_availability'), 20 );
 register_deactivation_hook( __FILE__, array( 'wooOUp', 'uninstall' ) );
 
 
