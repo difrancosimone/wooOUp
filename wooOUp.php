@@ -58,19 +58,22 @@ class wooOUp {
     static function wooOUp_product_availability() {
       if (is_product()) {
         global $product;
+        $variationsarray = array();
 	      if (is_product() and $product->product_type == 'variable') {
           $handle=new WC_Product_Variable($product);
           $variations1=$handle->get_children();
           foreach ($variations1 as $value) {
             $single_variation=new WC_Product_Variation($value);
             echo $single_variation->get_sku();
+            array_push($variationsarray, $single_variation->get_sku());
+            print_r($variationsarray);
             echo '<option  value="'.$value.'">'.implode(" / ", $single_variation->get_variation_attributes()).'-'.get_woocommerce_currency_symbol().$single_variation->price.'</option>';
           }
         }
         ?>
           <script>
             console.log("PLUGIN OK SKU-> <?php echo $product->get_sku(); ?>");
-            console.log("PLUGIN OK SKU-> <?php //echo $available_variations; ?>");
+            console.log("PLUGIN OK SKU-> <?php echo $variationsarray[1]; ?>");
           </script>
         <?php
       }
