@@ -9,6 +9,10 @@
    License: GPL2
    */
 
+require __DIR__ . '/vendor/autoload.php';
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
 
 class wooOUp {
     /*
@@ -61,12 +65,42 @@ class wooOUp {
       }
     }
     /*
+    * Function that alter the dropdown vaiation menù by product availability
+    */
+    static function wooOUp_variation_option( $term ) {
+        /*global $wpdb, $product;
+
+        $result = $wpdb->get_col( "SELECT slug FROM {$wpdb->prefix}terms WHERE name = '$term'" );
+        $term_slug = ( !empty( $result ) ) ? $result[0] : $term;
+        //build query to get vars
+        $query = "SELECT postmeta.post_id AS product_id
+                    FROM {$wpdb->prefix}postmeta AS postmeta
+                        LEFT JOIN {$wpdb->prefix}posts AS products ON ( products.ID = postmeta.post_id )
+                    WHERE postmeta.meta_key LIKE 'attribute_%'
+                        AND postmeta.meta_value = '$term_slug'
+                        AND products.post_parent = $product->id";
+        $variation_id = $wpdb->get_col( $query );
+        $parent = wp_get_post_parent_id( $variation_id[0] );
+        if ( $parent > 0 ) {
+    	    $_product = new WC_Product_Variation( $variation_id[0] );
+    		if (is_numeric($term)) {
+    			// calculating itemized price
+    			$totsomma = ($_product->get_price())/$term;
+    			return $term . ' --- ' . number_format($totsomma, 2, ',', ' ').'€ per 1';
+    		}
+        }
+        return $term;*/
+        echo $term;
+        print_r($variationsarray);
+    }
+    /*
     * Function to check availability via Api
     * The goal is show only available product quering directly the Api
     */
     static function wooOUp_product_availability() {
       if (is_product()) {
         global $product;
+        global $variationsarray;
         $variationsarray = array();
 	      if (is_product() and $product->product_type == 'variable') {
           $handle=new WC_Product_Variable($product);
@@ -79,9 +113,24 @@ class wooOUp {
             //echo '<option  value="'.$value.'">'.implode(" / ", $single_variation->get_variation_attributes()).'-'.get_woocommerce_currency_symbol().$single_variation->price.'</option>';
             ?>
               <script>
-                console.log("PLUGIN OK SKU-> <?php echo $single_variation->get_sku(); ?>");
+                console.log("PLUGIN OK SKU-> <?php echo $single_variation->get_sku()." - ".implode(" / ", $single_variation->get_variation_attributes()); ?>");
               </script>
             <?php
+            /*
+            * Getting quantities from laravel api
+            */
+            // Create a client with a base URI
+            $client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
+            $response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
+            //$response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
+            //echo $response;
+            $body = $response->getBody();
+            // Implicitly cast the body to a string and echo it
+            echo $body;
+            /*
+            * Product page function - hook the dropdown variations menu to show only avalable products
+            */
+            add_filter( 'woocommerce_variation_option_name', array( 'wooOUp','wooOUp_variation_option') );
           }
         } else {
           ?>
@@ -93,6 +142,8 @@ class wooOUp {
         }
       }
     }
+
+
 
 }
 /*
@@ -108,6 +159,5 @@ add_action( 'admin_menu', array( 'wooOUp','register_wooOUp'));
 */
 add_action( 'woocommerce_before_single_product_summary', array( 'wooOUp','wooOUp_product_availability'), 20 );
 register_deactivation_hook( __FILE__, array( 'wooOUp', 'uninstall' ) );
-
 
 ?>
