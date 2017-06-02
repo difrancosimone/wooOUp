@@ -137,16 +137,30 @@ class wooOUp {
         /*
         * Getting quantities from laravel api
         */
-        // Create a client with a base URI
+        var_dump($variationsarray);
+        echo $variationsarray[3];
+        exit;
+        // Create a client with a base URI GET REQEUEST
         $client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
         $response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
-        $response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
-        echo "ResponseCode: ".$response->getStatusCode()."<br>";
+        //$response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
+        //echo "ResponseCode: ".$response->getStatusCode()."<br>";
         $body = $response->getBody();
         // Implicitly cast the body to a string and echo it
         $jsonRes = (string) $body;
         $test = json_decode($jsonRes);
-        echo "Longitude: ".$test->coord->lon."<br>";
+        echo "<br>Longitude: ".$test->coord->lon."<br>";
+        //POST REQ
+        /*$clientpost = new GuzzleHttp\Client(['base_uri' => 'http://laravelapi.it']);
+        $responsepost = $clientpost->post('v1/product', [
+          'debug' => TRUE,
+          'body' => json_encode($variationsarray),
+          'headers' => [
+            'Content-Type' => 'application/x-www-form-urlencoded',
+          ]
+        ]);
+        $bodypost = $responsepost->getBody();
+        print_r(json_decode((string) $bodypost));
         /*
         * Product page function - hook the dropdown variations menu to show only avalable products
         */
