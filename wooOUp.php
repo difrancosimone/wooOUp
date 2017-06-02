@@ -111,28 +111,17 @@ class wooOUp {
             array_push($variationsarray, $single_variation->get_sku());
             //print_r($variationsarray);
             //echo '<option  value="'.$value.'">'.implode(" / ", $single_variation->get_variation_attributes()).'-'.get_woocommerce_currency_symbol().$single_variation->price.'</option>';
+            global $isVariable;
+            $isVariable = true;
             ?>
               <script>
                 console.log("PLUGIN OK SKU-> <?php echo $single_variation->get_sku()." - ".implode(" / ", $single_variation->get_variation_attributes()); ?>");
               </script>
             <?php
-            /*
-            * Getting quantities from laravel api
-            */
-            // Create a client with a base URI
-            $client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
-            $response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
-            //$response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
-            //echo $response;
-            $body = $response->getBody();
-            // Implicitly cast the body to a string and echo it
-            echo $body;
-            /*
-            * Product page function - hook the dropdown variations menu to show only avalable products
-            */
-            add_filter( 'woocommerce_variation_option_name', array( 'wooOUp','wooOUp_variation_option') );
           }
         } else {
+          global $isVariable;
+          $isVariable = false;
           ?>
             <script>
               console.log("PLUGIN OK SKU-> <?php echo $product->get_sku(); ?>");
@@ -140,6 +129,28 @@ class wooOUp {
             </script>
           <?php
         }
+        if ($isVariable){
+          echo "Has Variations";
+        } else {
+          echo "Single";
+        }
+        /*
+        * Getting quantities from laravel api
+        */
+        // Create a client with a base URI
+        $client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
+        $response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
+        $response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
+        echo "ResponseCode: ".$response->getStatusCode()."<br>";
+        $body = $response->getBody();
+        // Implicitly cast the body to a string and echo it
+        $jsonRes = (string) $body;
+        $test = json_decode($jsonRes);
+        echo "Longitude: ".$test->coord->lon."<br>";
+        /*
+        * Product page function - hook the dropdown variations menu to show only avalable products
+        */
+        add_filter( 'woocommerce_variation_option_name', array( 'wooOUp','wooOUp_variation_option') );
       }
     }
 
