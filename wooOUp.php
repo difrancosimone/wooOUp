@@ -92,6 +92,9 @@ class wooOUp {
         echo $term;
         //print_r($variationsarray);
     }
+    private function test(){
+      echo "prova";
+    }
     /*
     * Getting quantity from laravel api of product
     */
@@ -130,6 +133,7 @@ class wooOUp {
                 console.log("PLUGIN OK SKU-> <?php echo $single_variation->get_sku()." - ".implode(" / ", $single_variation->get_variation_attributes()); ?>");
               </script>
             <?php
+            wooOUp::test();
           }
           /*
           * Getting quantities from laravel api
