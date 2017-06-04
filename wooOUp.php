@@ -68,7 +68,9 @@ class wooOUp {
     * Function that alter the dropdown vaiation menù by product availability
     */
     static function wooOUp_variation_option( $term ) {
-        global $wpdb, $product;
+        global $wpdb, $product, $variationsarray;
+        var_dump($variationsarray); //test
+        //var_dump($term);
         $result = $wpdb->get_col( "SELECT slug FROM {$wpdb->prefix}terms WHERE name = '$term'" );
         $term_slug = ( !empty( $result ) ) ? $result[0] : $term;
         //build query to get vars
@@ -81,13 +83,12 @@ class wooOUp {
         $variation_id = $wpdb->get_col( $query );
         $parent = wp_get_post_parent_id( $variation_id[0] );
         if ( $parent > 0 ) {
-          echo $variation_id[0]." - ".$parent."<br>";
     	    $_product = new WC_Product_Variation( $variation_id[0] );
-    		if ($term) {
-    			// calculating itemized price
-    			$totsomma = $_product->get_price();
-    			return $term . ' --- ' .$totsomma;
-    		}
+      		if ($term) {
+      			// calculating itemized price
+      			$totsomma = $_product->get_price();
+      			return $term . ' --- ' .$totsomma;
+      		}
         }
         return $term;
     }
@@ -95,8 +96,18 @@ class wooOUp {
     * Getting quantity from laravel api of product
     */
     private function getApiProductQuantity($sku) {
+      /*global $variationsarray;
+      foreach ($variationsarray as $keym => $valuem) {
+        foreach ($valuem as $key => $value) {
+          echo $key." - ".$value."<br>";
+          // qui per ogni key che é la sku devo controllare via api e sostituire con la quantità
+          $finalqt = array($value => "100");
+          array_push($variationquantityes, $finalqt);
+        }
+      }*/
+      return "25";
       // Create a client with a base URI GET REQEUEST
-      $client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
+      /*$client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
       $response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
       //$response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
       //echo "ResponseCode: ".$response->getStatusCode()."<br>";
@@ -104,7 +115,7 @@ class wooOUp {
       // Implicitly cast the body to a string and echo it
       $jsonRes = (string) $body;
       $test = json_decode($jsonRes);
-      echo "<br>Longitude: ".$test->coord->lon."<br>";
+      echo "<br>Longitude: ".$test->coord->lon."<br>";*/
     }
     /*
     * Function to check availability via Api
@@ -112,18 +123,23 @@ class wooOUp {
     */
     static function wooOUp_product_availability() {
       if (is_product()) {
-        global $product;
-        global $variationsarray;
+        global $product, $variationsarray;
         $variationsarray = array();
 	      if (is_product() and $product->product_type == 'variable') {
-          $handle=new WC_Product_Variable($product);
-          $variations1=$handle->get_children();
+          $handle = new WC_Product_Variable($product);
+          $variations1 = $handle->get_children();
           foreach ($variations1 as $value) {
-            $single_variation=new WC_Product_Variation($value);
+            $single_variation = new WC_Product_Variation($value);
             //echo $single_variation->get_sku();
-            array_push($variationsarray, $single_variation->get_sku());
-            //print_r($variationsarray);
-            //echo '<option  value="'.$value.'">'.implode(" / ", $single_variation->get_variation_attributes()).'-'.get_woocommerce_currency_symbol().$single_variation->price.'</option>';
+            echo $single_variation->get_id();
+            $tmp = $single_variation->get_variation_attributes();
+            $test = array($single_variation->get_sku() => $tmp["attribute_colore"]);
+            array_push($variationsarray, $test);
+            /*
+            * Getting quantities from laravel api and set new stock for product
+            */
+            $stock_quantity = wooOUp::getApiProductQuantity($single_variation->get_sku()); //call to function test()
+            wc_update_product_stock( $single_variation, $stock_quantity );
             ?>
               <script>
                 console.log("PLUGIN OK SKU-> <?php echo $single_variation->get_sku()." - ".implode(" / ", $single_variation->get_variation_attributes()); ?>");
@@ -131,20 +147,9 @@ class wooOUp {
             <?php
           }
           /*
-          * Getting quantities from laravel api
-          */
-          echo json_encode($variationsarray)."<br>";
-          $resultVariations = array();
-          foreach ($variationsarray as $variaz) {
-            //array_push($resultVariations, $variaz "=> 12");
-            $resultVariations = array_merge($resultVariations, array($variaz => '12'));
-          }
-          echo json_encode($resultVariations)."<br>";
-          wooOUp::getApiProductQuantity($variationsarray); //call to function test()
-          /*
           * Product page function - hook the dropdown variations menu to show only avalable products
           */
-          add_filter( 'woocommerce_variation_option_name', array( 'wooOUp','wooOUp_variation_option') );
+          //add_filter( 'woocommerce_variation_option_name', array( 'wooOUp','wooOUp_variation_option') );
         } else {
           ?>
             <script>
@@ -153,27 +158,11 @@ class wooOUp {
             </script>
           <?php
           /*
-          * Product page function - hook the single product stock quantity
-          * $stock_quantity is the amount returned by the api
+          * Getting quantities from laravel api and set new stock for product
           */
-          $stock_quantity = 15; //test
+          $stock_quantity = wooOUp::getApiProductQuantity($sku); //call to function test()
           global $product;
           wc_update_product_stock( $product, $stock_quantity );
-
-          /*add_action( 'woocommerce_product_set_stock', array( 'wooOUp','wooOUp_product_single_quantity') );
-          function wooOUp_product_single_quantity( $obj ) {
-          		// Get stock quantity
-          		$stock = $obj->get_stock_quantity();
-          		// Foreach translation, sync stock amount
-          			foreach ( $translations as $lang => $translation ) {
-          				$p_other = new WC_Product_Simple( $translation );
-          				$amount = $p_other->set_stock( $stock );
-          			}
-          		}
-          		// reset this filter
-          		add_filter( 'woocommerce_product_set_stock', 'willy_sync_stock_amount_pll' );
-          	}
-          }*/
         }
       }
     }
@@ -190,7 +179,7 @@ add_action( 'admin_menu', array( 'wooOUp','register_wooOUp'));
 /*
 * Product page function - activate if is on woocommerce product single page
 */
-add_action( 'woocommerce_before_single_product_summary', array( 'wooOUp','wooOUp_product_availability'), 20 );
+add_action( 'woocommerce_single_product_summary', array( 'wooOUp','wooOUp_product_availability'), 20 );
 register_deactivation_hook( __FILE__, array( 'wooOUp', 'uninstall' ) );
 
 ?>
