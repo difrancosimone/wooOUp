@@ -77,6 +77,12 @@ class wooOUp {
           array_push($variationquantityes, $finalqt);
         }
       }*/
+      $options_wooOUp = get_option('wooOUp_option');
+      ?>
+        <script>
+          console.log("<?php echo esc_html($options_wooOUp['address']); ?>");
+        </script>
+      <?php
       return rand(-25, 65);
       // Create a client with a base URI GET REQEUEST
       /*$client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
