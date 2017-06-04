@@ -68,7 +68,7 @@ class wooOUp {
     * Function that alter the dropdown vaiation menù by product availability
     */
     static function wooOUp_variation_option( $term ) {
-        /*global $wpdb, $product;
+        global $wpdb, $product;
         $result = $wpdb->get_col( "SELECT slug FROM {$wpdb->prefix}terms WHERE name = '$term'" );
         $term_slug = ( !empty( $result ) ) ? $result[0] : $term;
         //build query to get vars
@@ -81,19 +81,15 @@ class wooOUp {
         $variation_id = $wpdb->get_col( $query );
         $parent = wp_get_post_parent_id( $variation_id[0] );
         if ( $parent > 0 ) {
+          echo $variation_id[0]." - ".$parent."<br>";
     	    $_product = new WC_Product_Variation( $variation_id[0] );
-    		if (is_numeric($term)) {
+    		if ($term) {
     			// calculating itemized price
-    			$totsomma = ($_product->get_price())/$term;
-    			return $term . ' --- ' . number_format($totsomma, 2, ',', ' ').'€ per 1';
+    			$totsomma = $_product->get_price();
+    			return $term . ' --- ' .$totsomma;
     		}
         }
-        return $term;*/
-        echo $term;
-        //print_r($variationsarray);
-    }
-    private function test(){
-      echo "prova";
+        return $term;
     }
     /*
     * Getting quantity from laravel api of product
@@ -133,7 +129,6 @@ class wooOUp {
                 console.log("PLUGIN OK SKU-> <?php echo $single_variation->get_sku()." - ".implode(" / ", $single_variation->get_variation_attributes()); ?>");
               </script>
             <?php
-            wooOUp::test();
           }
           /*
           * Getting quantities from laravel api
@@ -145,6 +140,7 @@ class wooOUp {
             $resultVariations = array_merge($resultVariations, array($variaz => '12'));
           }
           echo json_encode($resultVariations)."<br>";
+          wooOUp::getApiProductQuantity($variationsarray); //call to function test()
           /*
           * Product page function - hook the dropdown variations menu to show only avalable products
           */
