@@ -77,7 +77,7 @@ class wooOUp {
           array_push($variationquantityes, $finalqt);
         }
       }*/
-      return "25";
+      return rand(-25, 65);
       // Create a client with a base URI GET REQEUEST
       /*$client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
       $response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
