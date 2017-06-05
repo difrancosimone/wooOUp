@@ -20,7 +20,7 @@ class wooOUp {
     * Server Address and Port of Backend Api
     */
     static function install(){
-      $wooOup_options = ['address' => '127.0.0.1', 'port' => '80'];
+      $wooOup_options = ['uri' => 'http://127.0.0.1/api/v1/', 'endpoint' => 'product/'];
       add_option('wooOUp_option', $wooOup_options);
     }
     /*
@@ -39,7 +39,7 @@ class wooOUp {
 
     static function wooOUp_menu(){
       $options_wooOUp = get_option('wooOUp_option');
-      //creo la struttura della pagina opzioni ?>
+      //update options menu ?>
     	<div class="wrap">
     		<h2>Options</h2>
     		<form method="post">
@@ -47,10 +47,10 @@ class wooOUp {
     		<?php do_settings_sections( 'wooOUp-settings' ); ?>
     		<table class="form-table">
     			<tr valign="top">
-    			<th scope="row">Api Server Address</th>
-    			<td><input type="text" name="address_api" value="<?php echo esc_html($options_wooOUp['address']); ?>" /></td>
-          <th scope="row">Api Server Port</th>
-    			<td><input type="text" name="port_api" value="<?php echo esc_html($options_wooOUp['port']); ?>" /></td>
+    			<th scope="row">Api URI</th>
+    			<td><input type="text" name="uri_api" value="<?php echo esc_html($options_wooOUp['uri']); ?>" /></td>
+          <th scope="row">Api Endpoint</th>
+    			<td><input type="text" name="endpoint_api" value="<?php echo esc_html($options_wooOUp['endpoint']); ?>" /></td>
     			</tr>
     		</table>
     		<input type="submit" Value="Save">
@@ -58,41 +58,28 @@ class wooOUp {
     	</div>
     <?php
     	//save worpdress plugin options
-  		if ($_POST['address_api'] && $_POST['port_api']) {
+  		if ($_POST['uri_api'] && $_POST['endpoint_api']) {
         $options_wooOUp = get_option('wooOUp_option');
-        $newoption = ['address' => $_POST['address_api'], 'port' => $_POST['port_api']];
-        update_option( 'wooOUp_option', $options_wooOUp, $newoption );
+        $newoption = ['uri' => $_POST['uri_api'], 'endpoint' => $_POST['endpoint_api']];
+        update_option( 'wooOUp_option', $newoption );
       }
     }
     /*
     * Getting quantity from laravel api of product
     */
     private function getApiProductQuantity($prodcod) {
-      /*global $variationsarray;
-      foreach ($variationsarray as $keym => $valuem) {
-        foreach ($valuem as $key => $value) {
-          echo $key." - ".$value."<br>";
-          // qui per ogni key che é la sku devo controllare via api e sostituire con la quantità
-          $finalqt = array($value => "100");
-          array_push($variationquantityes, $finalqt);
-        }
-      }*/
       $options_wooOUp = get_option('wooOUp_option');
-      ?>
-        <script>
-          console.log("<?php echo esc_html($options_wooOUp['address']); ?>");
-        </script>
-      <?php
       // Create a client with a base URI GET REQEUEST
-      $client = new GuzzleHttp\Client(['base_uri' => 'http://warehouse.leghorngroup.com:5911/api/maggiacHQ.php']);
-      $response = $client->get('?codart='.$prodcod);
+      //$client = new GuzzleHttp\Client(['base_uri' => 'http://warehouse.leghorngroup.com:5911/api/maggiacHQ.php?codart=']);
+      $client = new GuzzleHttp\Client(['base_uri' => esc_html($options_wooOUp['uri'])]);
+      $response = $client->get(esc_html($options_wooOUp['endpoint']).$prodcod);
       $body = $response->getBody();
       // Implicitly cast the body to a string and echo it
       $jsonRes = (string) $body;
       $test = json_decode($jsonRes);
       echo "<br>Quantity: ".$test->giac."<br>";
       return $test->giac;
-      //return rand(-25, 65);
+      //return rand(-25, 65);  //enable for test purpose
     }
     /*
     * Function to check availability via Api
@@ -107,8 +94,6 @@ class wooOUp {
           $variations1 = $handle->get_children();
           foreach ($variations1 as $value) {
             $single_variation = new WC_Product_Variation($value);
-            //echo $single_variation->get_sku();
-            echo $single_variation->get_id();
             $tmp = $single_variation->get_variation_attributes();
             $test = array($single_variation->get_sku() => $tmp["attribute_colore"]);
             array_push($variationsarray, $test);
@@ -117,19 +102,8 @@ class wooOUp {
             */
             $stock_quantity = wooOUp::getApiProductQuantity($single_variation->get_sku()); //call to function test()
             wc_update_product_stock( $single_variation, $stock_quantity );
-            ?>
-              <script>
-                console.log("PLUGIN OK SKU-> <?php echo $single_variation->get_sku()." - ".implode(" / ", $single_variation->get_variation_attributes()); ?>");
-              </script>
-            <?php
           }
         } else {
-          ?>
-            <script>
-              console.log("PLUGIN OK SKU-> <?php echo $product->get_sku(); ?>");
-              //console.log("PLUGIN OK SKU-> <?php echo $variationsarray[1]; ?>");
-            </script>
-          <?php
           /*
           * Getting quantities from laravel api and set new stock for product
           */
