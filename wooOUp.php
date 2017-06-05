@@ -48,10 +48,11 @@ class wooOUp {
     		<table class="form-table">
     			<tr valign="top">
     			<th scope="row">Api URI</th>
-    			<td><input type="text" name="uri_api" value="<?php echo esc_html($options_wooOUp['uri']); ?>" /></td>
+    			<td><input type="text" name="uri_api" style="width:100%;display:block"; value="<?php echo esc_html($options_wooOUp['uri']); ?>" /></td>
+        </tr><tr>
           <th scope="row">Api Endpoint</th>
-    			<td><input type="text" name="endpoint_api" value="<?php echo esc_html($options_wooOUp['endpoint']); ?>" /></td>
-    			</tr>
+    			<td><input type="text" name="endpoint_api" style="width:100%;display:block"; value="<?php echo esc_html($options_wooOUp['endpoint']); ?>" /></td>
+        </tr>
     		</table>
     		<input type="submit" Value="Save">
     		</form>
