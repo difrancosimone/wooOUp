@@ -67,7 +67,7 @@ class wooOUp {
     /*
     * Getting quantity from laravel api of product
     */
-    private function getApiProductQuantity($sku) {
+    private function getApiProductQuantity($prodcod) {
       /*global $variationsarray;
       foreach ($variationsarray as $keym => $valuem) {
         foreach ($valuem as $key => $value) {
@@ -83,17 +83,24 @@ class wooOUp {
           console.log("<?php echo esc_html($options_wooOUp['address']); ?>");
         </script>
       <?php
-      return rand(-25, 65);
-      // Create a client with a base URI GET REQEUEST
-      /*$client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
-      $response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
-      //$response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
-      //echo "ResponseCode: ".$response->getStatusCode()."<br>";
+      $client = new GuzzleHttp\Client(['base_uri' => 'http://warehouse.leghorngroup.com:5911/api/maggiacHQ.php']);
+      $response = $client->get('?codart='.$prodcod);
       $body = $response->getBody();
       // Implicitly cast the body to a string and echo it
       $jsonRes = (string) $body;
       $test = json_decode($jsonRes);
-      echo "<br>Longitude: ".$test->coord->lon."<br>";*/
+      echo "<br>Quantity: ".$test->giac."<br>";
+      return rand(-25, 65);
+      // Create a client with a base URI GET REQEUEST
+      //$client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
+      //$response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
+      //$response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
+      //echo "ResponseCode: ".$response->getStatusCode()."<br>";
+      //$body = $response->getBody();
+      // Implicitly cast the body to a string and echo it
+      //$jsonRes = (string) $body;
+      //$test = json_decode($jsonRes);
+      //echo "<br>Longitude: ".$test->coord->lon."<br>";
     }
     /*
     * Function to check availability via Api
@@ -134,7 +141,7 @@ class wooOUp {
           /*
           * Getting quantities from laravel api and set new stock for product
           */
-          $stock_quantity = wooOUp::getApiProductQuantity($sku); //call to function test()
+          $stock_quantity = wooOUp::getApiProductQuantity($product->get_sku()); //call to function test()
           global $product;
           wc_update_product_stock( $product, $stock_quantity );
         }
