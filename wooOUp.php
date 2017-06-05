@@ -83,6 +83,7 @@ class wooOUp {
           console.log("<?php echo esc_html($options_wooOUp['address']); ?>");
         </script>
       <?php
+      // Create a client with a base URI GET REQEUEST
       $client = new GuzzleHttp\Client(['base_uri' => 'http://warehouse.leghorngroup.com:5911/api/maggiacHQ.php']);
       $response = $client->get('?codart='.$prodcod);
       $body = $response->getBody();
@@ -90,17 +91,8 @@ class wooOUp {
       $jsonRes = (string) $body;
       $test = json_decode($jsonRes);
       echo "<br>Quantity: ".$test->giac."<br>";
-      return rand(-25, 65);
-      // Create a client with a base URI GET REQEUEST
-      //$client = new GuzzleHttp\Client(['base_uri' => 'http://samples.openweathermap.org/data/2.5/']);
-      //$response = $client->get('weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
-      //$response = $client->request('GET', 'weather?q=London,uk&appid=b1b15e88fa797225412429c1c50c122a1');
-      //echo "ResponseCode: ".$response->getStatusCode()."<br>";
-      //$body = $response->getBody();
-      // Implicitly cast the body to a string and echo it
-      //$jsonRes = (string) $body;
-      //$test = json_decode($jsonRes);
-      //echo "<br>Longitude: ".$test->coord->lon."<br>";
+      return $test->giac;
+      //return rand(-25, 65);
     }
     /*
     * Function to check availability via Api
